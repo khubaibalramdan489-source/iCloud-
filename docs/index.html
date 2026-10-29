@@ -33,6 +33,11 @@ h2{font-size:20px;font-weight:900}
 .sub{color:var(--dim);font-size:14.5px}
 .btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-weight:900;font-size:18px;margin-top:12px;transition:transform .15s}
 .btn:active{transform:scale(.97)}
+.btn{position:relative;overflow:hidden;border:0;font-family:inherit;cursor:pointer}
+.btn .lbl,.btn .arrow{position:relative;z-index:1}
+.bar{position:absolute;inset:0 auto 0 0;width:0;background:rgba(0,0,0,.28);transition:width .15s linear}
+.cap .bar{background:rgba(255,255,255,.28)}
+.btn[disabled]{cursor:default}
 .btn small{display:block;font-weight:500;font-size:12.5px;opacity:.75}
 .rider{background:var(--amber);color:#000}
 .cap{background:var(--blue);color:#fff}
@@ -63,12 +68,12 @@ footer{text-align:center;color:var(--dim);font-size:13px;padding:26px 0 40px}
     <svg class="car" viewBox="0 0 150 60"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e6e9"/><stop offset="1" stop-color="#55555b"/></linearGradient></defs><path d="M6 46V36q1-6 8-8l14-3 14-15q3-3 9-3h30q7 0 11 6l11 12 17 3q6 2 6 9v9z" fill="url(#g)"/><path d="M38 26 49 14h18v12zM73 26V14h12q4 0 7 5l7 7z" fill="#16161a"/><circle cx="38" cy="47" r="10" fill="#050506"/><circle cx="38" cy="47" r="6" fill="#3a3a3f"/><circle cx="116" cy="47" r="10" fill="#050506"/><circle cx="116" cy="47" r="6" fill="#3a3a3f"/></svg>
     <h2>تطبيق العميل</h2>
     <p class="sub">احجز مقعدك بخطوتين.</p>
-    <a class="btn rider" id="dl-rider" href="#"><span>تحميل</span><span class="arrow">⬇</span></a>
+    <button class="btn rider" id="dl-rider" type="button"><span class="lbl">تحميل</span><span class="arrow">⬇</span><i class="bar"></i></button>
   </section>
   <section class="glass app cap-card">
     <h2>تطبيق الكابتن</h2>
     <p class="sub">انشر رحلتك ووافق على الطلبات.</p>
-    <a class="btn cap" id="dl-cap" href="#"><span>تحميل</span><span class="arrow">⬇</span></a>
+    <button class="btn cap" id="dl-cap" type="button"><span class="lbl">تحميل</span><span class="arrow">⬇</span><i class="bar"></i></button>
   </section>
   <p class="note" id="ver" style="text-align:center"></p>
   <p class="note" style="text-align:center">بعد التنزيل افتح الملف ووافق على «السماح بالتثبيت من هذا المصدر».</p>
@@ -77,22 +82,55 @@ footer{text-align:center;color:var(--dim);font-size:13px;padding:26px 0 40px}
 <script>
 // Change only this line if the repository moves.
 var REPO = "abnaa-shamal/iCloud-";
+var best = {};
+function mb(n){return (n/1048576).toFixed(1)}
+function setup(key, id){
+  var btn = document.getElementById(id), lbl = btn.querySelector(".lbl"), bar = btn.querySelector(".bar"), busy = false;
+  btn.addEventListener("click", function(){
+    var a = best[key];
+    if(busy) return;
+    if(!a){ location.href = "https://github.com/" + REPO + "/releases"; return; }
+    busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%";
+    function done(){ lbl.textContent = "تم التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.disabled = false; busy = false; }
+    function fallback(){
+      // the browser downloads the file by itself, without leaving this page
+      var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
+      lbl.textContent = "بدأ التنزيل… شوف إشعارات التنزيل"; bar.style.width = "100%"; btn.disabled = false; busy = false;
+    }
+    fetch(a.api, {headers:{Accept:"application/octet-stream"}}).then(function(r){
+      if(!r.ok || !r.body) throw 0;
+      var total = a.size || +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader();
+      function pump(){
+        return rd.read().then(function(x){
+          if(x.done) return;
+          parts.push(x.value); got += x.value.length;
+          var pct = total ? Math.min(100, Math.floor(got*100/total)) : 0;
+          bar.style.width = pct + "%";
+          lbl.textContent = "جاري التحميل… " + pct + "%  (" + mb(got) + " / " + mb(total) + " م.ب)";
+          return pump();
+        });
+      }
+      return pump().then(function(){
+        var blob = new Blob(parts, {type:"application/vnd.android.package-archive"});
+        var u = URL.createObjectURL(blob), l = document.createElement("a");
+        l.href = u; l.download = a.name; document.body.appendChild(l); l.click(); l.remove();
+        setTimeout(function(){URL.revokeObjectURL(u)}, 60000);
+        done();
+      });
+    }).catch(fallback);
+  });
+}
+setup("rider","dl-rider"); setup("captain","dl-cap");
 fetch("https://api.github.com/repos/" + REPO + "/releases?per_page=5").then(function(r){return r.json()}).then(function(list){
-  var best = {};
   list.forEach(function(rel){
     var m = String(rel.tag_name).match(/(\d+)$/); var n = m ? parseInt(m[1],10) : 0; if(!n) return;
     (rel.assets||[]).forEach(function(a){
       var k = /-rider-/.test(a.name) ? "rider" : /-captain-/.test(a.name) ? "captain" : null;
-      if(k && (!best[k] || n > best[k].n)) best[k] = {n:n, url:a.browser_download_url};
+      if(k && (!best[k] || n > best[k].n)) best[k] = {n:n, url:a.browser_download_url, api:a.url, size:a.size, name:a.name};
     });
   });
-  if(best.rider) document.getElementById("dl-rider").href = best.rider.url;
-  if(best.captain) document.getElementById("dl-cap").href = best.captain.url;
   if(best.rider) document.getElementById("ver").textContent = "آخر نسخة: " + best.rider.n;
-}).catch(function(){
-  var u = "https://github.com/" + REPO + "/releases";
-  document.getElementById("dl-rider").href = u; document.getElementById("dl-cap").href = u;
-});
+}).catch(function(){});
 </script>
 </body>
 </html>
