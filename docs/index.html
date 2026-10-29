@@ -91,7 +91,7 @@ function setup(key, id){
     if(busy) return;
     if(!a){ location.href = "https://github.com/" + REPO + "/releases"; return; }
     busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%";
-    function done(){ lbl.textContent = "تم التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.disabled = false; busy = false; }
+    function done(){ lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; }
     function fallback(){
       // the browser downloads the file by itself, without leaving this page
       var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
