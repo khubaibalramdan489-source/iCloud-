@@ -95,11 +95,11 @@ function setup(key, id){
     function fallback(){
       // the browser downloads the file by itself, without leaving this page
       var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
-      lbl.textContent = "بدأ التنزيل… شوف إشعارات التنزيل"; bar.style.width = "100%"; btn.disabled = false; busy = false;
+      lbl.textContent = "تعذّر عرض النسبة، التنزيل بدأ"; bar.style.width = "100%"; btn.disabled = false; busy = false;
     }
-    fetch(a.api, {headers:{Accept:"application/octet-stream"}}).then(function(r){
+    fetch(a.api, {cache:"no-store"}).then(function(r){
       if(!r.ok || !r.body) throw 0;
-      var total = a.size || +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader();
+      var total = +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader();
       function pump(){
         return rd.read().then(function(x){
           if(x.done) return;
@@ -121,15 +121,10 @@ function setup(key, id){
   });
 }
 setup("rider","dl-rider"); setup("captain","dl-cap");
-fetch("https://api.github.com/repos/" + REPO + "/releases?per_page=5").then(function(r){return r.json()}).then(function(list){
-  list.forEach(function(rel){
-    var m = String(rel.tag_name).match(/(\d+)$/); var n = m ? parseInt(m[1],10) : 0; if(!n) return;
-    (rel.assets||[]).forEach(function(a){
-      var k = /-rider-/.test(a.name) ? "rider" : /-captain-/.test(a.name) ? "captain" : null;
-      if(k && (!best[k] || n > best[k].n)) best[k] = {n:n, url:a.browser_download_url, api:a.url, size:a.size, name:a.name};
-    });
-  });
-  if(best.rider) document.getElementById("ver").textContent = "آخر نسخة: " + best.rider.n;
+fetch("apk/version.json?t=" + Date.now()).then(function(r){return r.json()}).then(function(v){
+  best.rider = {n:v.n, api:"apk/abnaa-rider.apk?v=" + v.n, url:"apk/abnaa-rider.apk?v=" + v.n, name:v.rider};
+  best.captain = {n:v.n, api:"apk/abnaa-captain.apk?v=" + v.n, url:"apk/abnaa-captain.apk?v=" + v.n, name:v.captain};
+  document.getElementById("ver").textContent = "آخر نسخة: " + v.n;
 }).catch(function(){});
 </script>
 </body>
