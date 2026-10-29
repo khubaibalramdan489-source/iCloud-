@@ -75,6 +75,11 @@ footer{text-align:center;color:var(--dim);font-size:13px;padding:26px 0 40px}
     <p class="sub">انشر رحلتك ووافق على الطلبات.</p>
     <button class="btn cap" id="dl-cap" type="button"><span class="lbl">تحميل</span><span class="arrow">⬇</span><i class="bar"></i></button>
   </section>
+  <section class="glass app">
+    <h2>تطبيق المشرف</h2>
+    <p class="sub">للموافقة على الكباتن وإدارة النظام.</p>
+    <button class="btn cap" id="dl-admin" type="button"><span class="lbl">تحميل</span><span class="arrow">⬇</span><i class="bar"></i></button>
+  </section>
   <p class="note" id="ver" style="text-align:center"></p>
   <p class="note" style="text-align:center">بعد التنزيل افتح الملف ووافق على «السماح بالتثبيت من هذا المصدر».</p>
 </main>
@@ -120,10 +125,11 @@ function setup(key, id){
     }).catch(fallback);
   });
 }
-setup("rider","dl-rider"); setup("captain","dl-cap");
+setup("rider","dl-rider"); setup("captain","dl-cap"); setup("admin","dl-admin");
 fetch("apk/version.json?t=" + Date.now()).then(function(r){return r.json()}).then(function(v){
   best.rider = {n:v.n, api:"apk/abnaa-rider.apk?v=" + v.n, url:"apk/abnaa-rider.apk?v=" + v.n, name:v.rider};
   best.captain = {n:v.n, api:"apk/abnaa-captain.apk?v=" + v.n, url:"apk/abnaa-captain.apk?v=" + v.n, name:v.captain};
+  best.admin = {n:v.n, api:"apk/abnaa-admin.apk?v=" + v.n, url:"apk/abnaa-admin.apk?v=" + v.n, name:"abnaa-admin-1.0." + v.n + ".apk"};
   document.getElementById("ver").textContent = "آخر نسخة: " + v.n;
 }).catch(function(){});
 </script>
