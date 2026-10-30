@@ -38,6 +38,9 @@ h2{font-size:20px;font-weight:900}
 .bar{position:absolute;inset:0 auto 0 0;width:0;background:rgba(0,0,0,.28);transition:width .15s linear}
 .cap .bar{background:rgba(255,255,255,.28)}
 .btn[disabled]{cursor:default}
+.btn.ok{background:#1fa463;color:#fff}
+.msg{font-size:13.5px;color:#ffb4a8;margin-top:8px;display:none}
+.link{background:none;border:0;color:var(--dim);font:inherit;font-size:13.5px;text-decoration:underline;cursor:pointer;margin-top:10px;display:block}
 .btn small{display:block;font-weight:500;font-size:12.5px;opacity:.75}
 .rider{background:var(--amber);color:#000}
 .cap{background:var(--blue);color:#fff}
@@ -84,18 +87,44 @@ footer{text-align:center;color:var(--dim);font-size:13px;padding:26px 0 40px}
 var REPO = "abnaa-shamal/iCloud-";
 var best = {};
 function mb(n){return (n/1048576).toFixed(1)}
+var PKG = {rider:"jo.abnaashamal.rider", captain:"jo.abnaashamal.Cap"};
+function stored(k){try{return localStorage.getItem("inst_"+k)}catch(e){return null}}
+function store(k,v){try{localStorage.setItem("inst_"+k,v)}catch(e){}}
 function setup(key, id){
   var btn = document.getElementById(id), lbl = btn.querySelector(".lbl"), bar = btn.querySelector(".bar"), busy = false;
+  var conf = document.createElement("button"); conf.type = "button"; conf.className = "btn ok"; conf.style.display = "none";
+  conf.innerHTML = '<span class="lbl">تم التثبيت ✓</span><span class="arrow">✔</span>';
+  var open = document.createElement("button"); open.type = "button"; open.className = "btn ok"; open.style.display = "none";
+  open.innerHTML = '<span class="lbl">فتح التطبيق</span><span class="arrow">↗</span>';
+  var msg = document.createElement("p"); msg.className = "msg"; msg.textContent = "التطبيق مش مثبّت على جوالك، حمّله وثبّته أول.";
+  var again = document.createElement("button"); again.type = "button"; again.className = "link"; again.textContent = "تحميل نسخة جديدة"; again.style.display = "none";
+  btn.parentNode.appendChild(conf); btn.parentNode.appendChild(open); btn.parentNode.appendChild(msg); btn.parentNode.appendChild(again);
+  function show(mode){ // dl | conf | open
+    btn.style.display = mode === "dl" || mode === "conf" ? "" : "none";
+    conf.style.display = mode === "conf" ? "" : "none";
+    open.style.display = mode === "open" ? "" : "none";
+    again.style.display = mode === "open" ? "" : "none";
+  }
+  function askInstalled(){ show("conf"); }
+  conf.addEventListener("click", function(){ store(key, String(best[key] ? best[key].n : "1")); show("open"); });
+  again.addEventListener("click", function(){ store(key, ""); lbl.textContent = "تحميل"; bar.style.width = "0"; btn.style.background = ""; btn.style.color = ""; show("dl"); });
+  open.addEventListener("click", function(){
+    msg.style.display = "none";
+    var t = setTimeout(function(){ if(!document.hidden) msg.style.display = "block"; }, 1800);
+    document.addEventListener("visibilitychange", function h(){ if(document.hidden){ clearTimeout(t); document.removeEventListener("visibilitychange", h); } });
+    location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=" + PKG[key] + ";end";
+  });
+  btn._init = function(){ var st = stored(key); show(st && best[key] && String(best[key].n) === st ? "open" : "dl"); };
   btn.addEventListener("click", function(){
     var a = best[key];
     if(busy) return;
     if(!a){ location.href = "https://github.com/" + REPO + "/releases"; return; }
     busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%";
-    function done(){ lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; }
+    function done(){ lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; askInstalled(); }
     function fallback(){
       // the browser downloads the file by itself, without leaving this page
       var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
-      lbl.textContent = "تعذّر عرض النسبة، التنزيل بدأ"; bar.style.width = "100%"; btn.disabled = false; busy = false;
+      lbl.textContent = "تعذّر عرض النسبة، التنزيل بدأ"; bar.style.width = "100%"; btn.disabled = false; busy = false; askInstalled();
     }
     fetch(a.api, {cache:"no-store"}).then(function(r){
       if(!r.ok || !r.body) throw 0;
@@ -125,6 +154,7 @@ fetch("apk/version.json?t=" + Date.now()).then(function(r){return r.json()}).the
   best.rider = {n:v.n, api:"apk/abnaa-rider.apk?v=" + v.n, url:"apk/abnaa-rider.apk?v=" + v.n, name:v.rider};
   best.captain = {n:v.n, api:"apk/abnaa-captain.apk?v=" + v.n, url:"apk/abnaa-captain.apk?v=" + v.n, name:v.captain};
   document.getElementById("ver").textContent = "آخر نسخة: " + v.n;
+  ["dl-rider","dl-cap"].forEach(function(i){ var b = document.getElementById(i); if(b._init) b._init(); });
 }).catch(function(){});
 </script>
 </body>
