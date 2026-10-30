@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أبناء الشمال • المشرف</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--amber:#f2b300;--blue:#3d8bff;--ink:#f4f4f6;--dim:#9a9aa0}
+*{box-sizing:border-box;margin:0}
+body{font-family:Cairo,system-ui,sans-serif;background:#000;color:var(--ink);line-height:1.7;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;background:linear-gradient(#212123,#050505 45%,#000);z-index:-2}
+.orb{position:fixed;width:420px;height:420px;border-radius:50%;filter:blur(70px);z-index:-1;opacity:.35;animation:float 9s ease-in-out infinite alternate}
+.o1{background:var(--amber);top:-120px;right:-140px}
+.o2{background:var(--blue);bottom:-160px;left:-160px;animation-delay:-4s;opacity:.25}
+@keyframes float{to{transform:translate(-40px,50px) scale(1.12)}}
+.wrap{max-width:520px;margin:0 auto;padding:0 18px}
+header{padding:64px 0 26px;text-align:center}
+.mark{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:26px;margin-bottom:18px}
+h1{font-size:42px;font-weight:900;letter-spacing:.3px}
+.tag{margin-top:6px;color:var(--dim);font-size:17px}
+.glass{position:relative;border-radius:26px;padding:20px;margin-bottom:14px;
+ background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02) 40%),linear-gradient(#232326,#0f0f10);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 20px 40px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12);
+ animation:rise .7s both}
+.glass:nth-of-type(2){animation-delay:.1s}.glass:nth-of-type(3){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+.glass:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ background:linear-gradient(115deg,rgba(255,255,255,.14),transparent 35%)}
+h2{font-size:20px;font-weight:900}
+.sub{color:var(--dim);font-size:14.5px}
+.btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;border-radius:999px;text-decoration:none;font-weight:900;font-size:18px;margin-top:12px;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn{position:relative;overflow:hidden;border:0;font-family:inherit;cursor:pointer}
+.btn .lbl,.btn .arrow{position:relative;z-index:1}
+.bar{position:absolute;inset:0 auto 0 0;width:0;background:rgba(0,0,0,.28);transition:width .15s linear}
+.cap .bar{background:rgba(255,255,255,.28)}
+.btn[disabled]{cursor:default}
+.btn.ok{background:#1fa463;color:#fff}
+.msg{font-size:13.5px;color:#ffb4a8;margin-top:8px;display:none}
+.link{background:none;border:0;color:var(--dim);font:inherit;font-size:13.5px;text-decoration:underline;cursor:pointer;margin-top:10px;display:block}
+.btn small{display:block;font-weight:500;font-size:12.5px;opacity:.75}
+.rider{background:var(--amber);color:#000}
+.cap{background:var(--blue);color:#fff}
+.arrow{font-size:22px}
+.cap-card{background:linear-gradient(160deg,rgba(61,139,255,.16),rgba(255,255,255,.02) 40%),linear-gradient(#303136,#1c1d20)}
+.car{display:block;width:150px;margin:0 0 6px;animation:drive 5s ease-in-out infinite alternate}
+@keyframes drive{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
+.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:10px;margin-top:12px}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;font-size:15.5px}
+.steps li:before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;background:var(--amber);color:#000;font-weight:900;display:grid;place-items:center}
+.soon{display:flex;align-items:center;gap:12px}
+.badge{background:var(--amber);color:#000;font-weight:900;font-size:12.5px;border-radius:12px;padding:3px 12px}
+.note{font-size:13.5px;color:var(--dim);margin-top:10px}
+footer{text-align:center;color:var(--dim);font-size:13px;padding:26px 0 40px}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="orb o1"></div><div class="orb o2"></div>
+<header>
+  <div class="wrap">
+    <div class="mark glass" style="padding:0;margin-bottom:18px"><svg width="46" height="46" viewBox="0 0 46 46"><path d="M5 38 20 8l15 30z" fill="#efe6da"/><path d="M19 38 31 15l12 23z" fill="#f2b300"/></svg></div>
+    <h1>أبناء الشمال</h1>
+    <p class="tag">احجز مقعدك أو انشر رحلتك. كل شي بمكان واحد، بدون قروبات واتساب.</p>
+  </div>
+</header>
+<main class="wrap">
+  <section class="glass app cap-card">
+    <h2>تطبيق المشرف</h2>
+    <p class="sub">للمشرف فقط.</p>
+    <button class="btn cap" id="dl-admin" type="button"><span class="lbl">تحميل</span><span class="arrow">⬇</span><i class="bar"></i></button>
+  </section>
+  <p class="note" id="ver" style="text-align:center"></p>
+  <p class="note" style="text-align:center">بعد التنزيل افتح الملف ووافق على «السماح بالتثبيت من هذا المصدر».</p>
+</main>
+<footer dir="ltr">Developed &amp; Designed by <b style="color:#f4f4f6">Abo-Tala</b></footer>
+<script>
+// Change only this line if the repository moves.
+var REPO = "abnaa-shamal/iCloud-";
+var best = {};
+function mb(n){return (n/1048576).toFixed(1)}
+var PKG = {admin:"jo.abnaashamal.admin"};
+function stored(k){try{return localStorage.getItem("inst_"+k)}catch(e){return null}}
+function store(k,v){try{localStorage.setItem("inst_"+k,v)}catch(e){}}
+function setup(key, id){
+  var btn = document.getElementById(id), lbl = btn.querySelector(".lbl"), bar = btn.querySelector(".bar"), busy = false;
+  var conf = document.createElement("button"); conf.type = "button"; conf.className = "btn ok"; conf.style.display = "none";
+  conf.innerHTML = '<span class="lbl">تم التثبيت ✓</span><span class="arrow">✔</span>';
+  var open = document.createElement("button"); open.type = "button"; open.className = "btn ok"; open.style.display = "none";
+  open.innerHTML = '<span class="lbl">فتح التطبيق</span><span class="arrow">↗</span>';
+  var msg = document.createElement("p"); msg.className = "msg"; msg.textContent = "التطبيق مش مثبّت على جوالك، حمّله وثبّته أول.";
+  var again = document.createElement("button"); again.type = "button"; again.className = "link"; again.textContent = "تحميل نسخة جديدة"; again.style.display = "none";
+  btn.parentNode.appendChild(conf); btn.parentNode.appendChild(open); btn.parentNode.appendChild(msg); btn.parentNode.appendChild(again);
+  function show(mode){ // dl | conf | open
+    btn.style.display = mode === "dl" || mode === "conf" ? "" : "none";
+    conf.style.display = mode === "conf" ? "" : "none";
+    open.style.display = mode === "open" ? "" : "none";
+    again.style.display = mode === "open" ? "" : "none";
+  }
+  function askInstalled(){ show("conf"); }
+  conf.addEventListener("click", function(){ store(key, String(best[key] ? best[key].n : "1")); show("open"); });
+  again.addEventListener("click", function(){ store(key, ""); lbl.textContent = "تحميل"; bar.style.width = "0"; btn.style.background = ""; btn.style.color = ""; show("dl"); });
+  open.addEventListener("click", function(){
+    msg.style.display = "none";
+    var t = setTimeout(function(){ if(!document.hidden) msg.style.display = "block"; }, 1800);
+    document.addEventListener("visibilitychange", function h(){ if(document.hidden){ clearTimeout(t); document.removeEventListener("visibilitychange", h); } });
+    location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=" + PKG[key] + ";end";
+  });
+  btn._init = function(){ var st = stored(key); show(st && best[key] && String(best[key].n) === st ? "open" : "dl"); };
+  btn.addEventListener("click", function(){
+    var a = best[key];
+    if(busy) return;
+    if(!a){ location.href = "https://github.com/" + REPO + "/releases"; return; }
+    busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%";
+    function done(){ lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; askInstalled(); }
+    function fallback(){
+      // the browser downloads the file by itself, without leaving this page
+      var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
+      lbl.textContent = "تعذّر عرض النسبة، التنزيل بدأ"; bar.style.width = "100%"; btn.disabled = false; busy = false; askInstalled();
+    }
+    fetch(a.api, {cache:"no-store"}).then(function(r){
+      if(!r.ok || !r.body) throw 0;
+      var total = +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader();
+      function pump(){
+        return rd.read().then(function(x){
+          if(x.done) return;
+          parts.push(x.value); got += x.value.length;
+          var pct = total ? Math.min(100, Math.floor(got*100/total)) : 0;
+          bar.style.width = pct + "%";
+          lbl.textContent = "جاري التحميل… " + pct + "%  (" + mb(got) + " / " + mb(total) + " م.ب)";
+          return pump();
+        });
+      }
+      return pump().then(function(){
+        var blob = new Blob(parts, {type:"application/vnd.android.package-archive"});
+        var u = URL.createObjectURL(blob), l = document.createElement("a");
+        l.href = u; l.download = a.name; document.body.appendChild(l); l.click(); l.remove();
+        setTimeout(function(){URL.revokeObjectURL(u)}, 60000);
+        done();
+      });
+    }).catch(fallback);
+  });
+}
+setup("admin","dl-admin");
+fetch("apk/version.json?t=" + Date.now()).then(function(r){return r.json()}).then(function(v){
+  best.admin = {n:v.n, api:"apk/abnaa-admin.apk?v=" + v.n, url:"apk/abnaa-admin.apk?v=" + v.n, name:v.admin};
+  document.getElementById("ver").textContent = "آخر نسخة: " + v.n;
+  ["dl-admin"].forEach(function(i){ var b = document.getElementById(i); if(b._init) b._init(); });
+}).catch(function(){});
+</script>
+</body>
+</html>
