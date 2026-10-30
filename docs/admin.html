@@ -93,6 +93,21 @@ function setup(key, id){
   var msg = document.createElement("p"); msg.className = "msg"; msg.textContent = "التطبيق مش مثبّت على جوالك، حمّله وثبّته أول.";
   var again = document.createElement("button"); again.type = "button"; again.className = "link"; again.textContent = "تحميل نسخة جديدة"; again.style.display = "none";
   btn.parentNode.appendChild(conf); btn.parentNode.appendChild(open); btn.parentNode.appendChild(msg); btn.parentNode.appendChild(again);
+  var ctl = document.createElement("div"); ctl.style.cssText = "display:none;gap:10px;margin-top:10px";
+  var pauseB = document.createElement("button"); pauseB.type = "button"; pauseB.className = "btn"; pauseB.style.cssText = "margin-top:0;flex:1;padding:12px 10px;font-size:15px;justify-content:center;background:#2a2a30;color:#fff"; pauseB.textContent = "⏸ إيقاف مؤقت";
+  var stopB = document.createElement("button"); stopB.type = "button"; stopB.className = "btn"; stopB.style.cssText = "margin-top:0;flex:1;padding:12px 10px;font-size:15px;justify-content:center;background:#7a1f1f;color:#fff"; stopB.textContent = "⏹ إيقاف التحميل";
+  ctl.appendChild(pauseB); ctl.appendChild(stopB); btn.parentNode.appendChild(ctl);
+  var paused = false, stopped = false, wake = null, reader = null;
+  pauseB.addEventListener("click", function(){
+    paused = !paused;
+    pauseB.textContent = paused ? "▶ متابعة" : "⏸ إيقاف مؤقت";
+    if(!paused && wake){ var w = wake; wake = null; w(); }
+  });
+  stopB.addEventListener("click", function(){
+    stopped = true; paused = false;
+    if(wake){ var w = wake; wake = null; w(); }
+    try{ if(reader) reader.cancel(); }catch(e){}
+  });
   function show(mode){ // dl | conf | open
     btn.style.display = mode === "dl" || mode === "conf" ? "" : "none";
     conf.style.display = mode === "conf" ? "" : "none";
@@ -113,8 +128,9 @@ function setup(key, id){
     var a = best[key];
     if(busy) return;
     if(!a){ location.href = "https://github.com/" + REPO + "/releases"; return; }
-    busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%";
-    function done(){ lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; askInstalled(); }
+    busy = true; btn.disabled = true; lbl.textContent = "جاري التحميل… 0%"; paused = false; stopped = false; pauseB.textContent = "⏸ إيقاف مؤقت"; ctl.style.display = "flex";
+    function resetUi(){ ctl.style.display = "none"; }
+    function done(){ resetUi(); lbl.textContent = "اكتمل التحميل ✓ افتح الملف وثبّت"; bar.style.width = "100%"; btn.style.background = "#1fa463"; btn.style.color = "#fff"; btn.disabled = false; busy = false; askInstalled(); }
     function fallback(){
       // the browser downloads the file by itself, without leaving this page
       var f = document.createElement("iframe"); f.style.display = "none"; f.src = a.url; document.body.appendChild(f);
@@ -122,9 +138,14 @@ function setup(key, id){
     }
     fetch(a.api, {cache:"no-store"}).then(function(r){
       if(!r.ok || !r.body) throw 0;
-      var total = +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader();
+      var total = +r.headers.get("content-length") || 0, got = 0, parts = [], rd = r.body.getReader(); reader = rd;
       function pump(){
-        return rd.read().then(function(x){
+        if(stopped) return Promise.resolve();
+        var gate = paused ? new Promise(function(res){ wake = res; lbl.textContent = "⏸ متوقف مؤقتاً… " + (total ? Math.floor(got*100/total) : 0) + "%"; }) : Promise.resolve();
+        return gate.then(function(){
+          if(stopped) return {done:true};
+          return rd.read();
+        }).then(function(x){
           if(x.done) return;
           parts.push(x.value); got += x.value.length;
           var pct = total ? Math.min(100, Math.floor(got*100/total)) : 0;
@@ -134,13 +155,14 @@ function setup(key, id){
         });
       }
       return pump().then(function(){
+        if(stopped){ resetUi(); lbl.textContent = "تم إيقاف التحميل. اضغط للتحميل من جديد"; bar.style.width = "0"; btn.disabled = false; busy = false; return; }
         var blob = new Blob(parts, {type:"application/vnd.android.package-archive"});
         var u = URL.createObjectURL(blob), l = document.createElement("a");
         l.href = u; l.download = a.name; document.body.appendChild(l); l.click(); l.remove();
         setTimeout(function(){URL.revokeObjectURL(u)}, 60000);
         done();
       });
-    }).catch(fallback);
+    }).catch(function(){ if(stopped){ resetUi(); lbl.textContent = "تم إيقاف التحميل. اضغط للتحميل من جديد"; bar.style.width = "0"; btn.disabled = false; busy = false; } else { resetUi(); fallback(); } });
   });
 }
 setup("admin","dl-admin");
