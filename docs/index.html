@@ -122,8 +122,8 @@ function setup(key, id){
 }
 setup("rider","dl-rider"); setup("captain","dl-cap");
 fetch("apk/version.json?t=" + Date.now()).then(function(r){return r.json()}).then(function(v){
-  best.rider = {n:v.n, api:"apk/abnaa-rider.apk?v=49" + v.n, url:"apk/abnaa-rider.apk?v=49" + v.n, name:v.rider};
-  best.captain = {n:v.n, api:"apk/abnaa-captain.apk?v=49" + v.n, url:"apk/abnaa-captain.apk?v=49" + v.n, name:v.captain};
+  best.rider = {n:v.n, api:"apk/abnaa-rider.apk?v=" + v.n, url:"apk/abnaa-rider.apk?v=" + v.n, name:v.rider};
+  best.captain = {n:v.n, api:"apk/abnaa-captain.apk?v=" + v.n, url:"apk/abnaa-captain.apk?v=" + v.n, name:v.captain};
   document.getElementById("ver").textContent = "آخر نسخة: " + v.n;
 }).catch(function(){});
 </script>
